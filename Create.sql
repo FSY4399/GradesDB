@@ -14,12 +14,13 @@ CREATE TABLE people (
     email VARCHAR(255) NOT NULL,
     PRIMARY KEY (person_id)
 );
-
-ALTER TABLE people
+ALTER TABLE people -- se puede hacer asi o metiendo las restricciones dentro de create
    ADD CONSTRAINT rn12_people_age CHECK (age BETWEEN 16 AND 70),
    ADD CONSTRAINT rn14_people_dni CHECK (dni REGEXP '^[0-9]{8}[A-Za-z]$'),
    ADD CONSTRAINT rn_uq_people_dni UNIQUE (dni),
    ADD CONSTRAINT rn_uq_people_email UNIQUE (email);
+
+
 
 DROP TABLE IF EXISTS professors;
 
@@ -32,12 +33,12 @@ CREATE TABLE professors (
     ADD CONSTRAINT ck_professors_category CHECK (
         category IN ('Ayudante','AyudanteDoctor','Titular','Catedrático')
     );
-);
-
-ALTER TABLE professors
-    ADD CONSTRAINT ck_professors_category CHECK (
+	 ADD CONSTRAINT ck_professors_category CHECK (
         category IN ('Ayudante','AyudanteDoctor','Titular','Catedrático')
     );
+);
+    
+
 
 
 DROP TABLE IF EXISTS students;
@@ -47,7 +48,13 @@ CREATE TABLE students (
     access_method VARCHAR(20) NOT NULL,
     PRIMARY KEY (student_id),
     FOREIGN KEY (student_id) REFERENCES people(person_id)
+    ADD CONSTRAINT ck_students_access_method CHECK (
+        access_method IN ('Selectividad','Ciclo','Mayor','Titulado','Extranjero')
+    );
 );
+    
+
+
 
 DROP TABLE IF EXISTS degrees;
 
@@ -56,7 +63,13 @@ CREATE TABLE degrees (
     degree_name VARCHAR(80) NOT NULL,
     duration_years TINYINT NOT NULL,
     PRIMARY KEY (degree_id)
+   ADD CONSTRAINT rn13_degree_duration CHECK (duration_years BETWEEN 3 AND 6),
+    ADD CONSTRAINT rn_uq_degrees_name UNIQUE (degree_name);
+
+
 );
+
+   
 
 DROP TABLE IF EXISTS subjects;
 
@@ -70,7 +83,16 @@ CREATE TABLE subjects (
     subject_type VARCHAR(30) NOT NULL,
     PRIMARY KEY (subject_id),
     FOREIGN KEY (degree_id) REFERENCES degrees(degree_id)
+    ADD CONSTRAINT rn10_subjects_credits CHECK (credits IN (6, 12)),
+    ADD CONSTRAINT rn16_subjects_course CHECK (course BETWEEN 1 AND 6),
+    ADD CONSTRAINT ck_subjects_type CHECK (
+        subject_type IN ('Formación Básica','Obligatoria','Optativa')
+    ),
+    ADD CONSTRAINT rn_uq_subjects_name UNIQUE (subject_name),
+    ADD CONSTRAINT rn_uq_subjects_acronym UNIQUE (acronym);
 );
+
+
 
 DROP TABLE IF EXISTS GROUPS;
 
@@ -82,7 +104,15 @@ CREATE TABLE groups (
     academic_year YEAR NOT NULL,
     PRIMARY KEY (group_id),
     FOREIGN KEY (subject_id) REFERENCES subjects(subject_id)
+    ADD CONSTRAINT rn15_groups_year CHECK (academic_year BETWEEN 2000 AND 2100),
+    ADD CONSTRAINT ck_groups_activity CHECK (
+        activity IN ('Teoría','Laboratorio')
+    ),
+    ADD CONSTRAINT rn_uq_groups_name UNIQUE (subject_id, group_name, academic_year);
 );
+
+
+
 
 DROP TABLE IF EXISTS group_enrollments;
 
@@ -93,6 +123,9 @@ CREATE TABLE group_enrollments (
     FOREIGN KEY (student_id) REFERENCES students(student_id),
     FOREIGN KEY (group_id) REFERENCES groups(group_id)
 );
+
+
+
 
 DROP TABLE IF EXISTS grades;
 
@@ -106,6 +139,13 @@ CREATE TABLE grades (
     PRIMARY KEY (grade_id),
     FOREIGN KEY (student_id) REFERENCES students(student_id),
     FOREIGN KEY (group_id) REFERENCES groups(group_id)
+    ADD CONSTRAINT rn11_grades_value CHECK (grade_value BETWEEN 0 AND 10),
+    ADD CONSTRAINT rn01_grades_with_honors CHECK (
+        with_honors = 0 OR grade_value >= 9
+    ),
+    ADD CONSTRAINT rn18_grades_exam_call CHECK (
+        exam_call IN ('Primera','Segunda','Tercera','Extraordinaria')
+    );
 );
 
 DROP TABLE IF EXISTS subject_enrollments;
@@ -118,6 +158,9 @@ CREATE TABLE subject_enrollments (
     FOREIGN KEY (subject_id) REFERENCES subjects(subject_id)
 );
 
+
+
+
 DROP TABLE IF EXISTS teaching_loads;
 
 CREATE TABLE teaching_loads (
@@ -127,4 +170,5 @@ CREATE TABLE teaching_loads (
     PRIMARY KEY (professor_id, group_id),
     FOREIGN KEY (professor_id) REFERENCES professors(professor_id),
     FOREIGN KEY (group_id) REFERENCES groups(group_id)
+    ADD CONSTRAINT ck_teaching_loads_credits CHECK (credits > 0);
 );
