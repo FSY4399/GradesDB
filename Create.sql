@@ -15,6 +15,12 @@ CREATE TABLE people (
     PRIMARY KEY (person_id)
 );
 
+ALTER TABLE people
+   ADD CONSTRAINT rn12_people_age CHECK (age BETWEEN 16 AND 70),
+   ADD CONSTRAINT rn14_people_dni CHECK (dni REGEXP '^[0-9]{8}[A-Za-z]$'),
+   ADD CONSTRAINT rn_uq_people_dni UNIQUE (dni),
+   ADD CONSTRAINT rn_uq_people_email UNIQUE (email);
+
 DROP TABLE IF EXISTS professors;
 
 CREATE TABLE professors (
@@ -22,7 +28,17 @@ CREATE TABLE professors (
     category VARCHAR(30) NOT NULL,
     PRIMARY KEY (professor_id),
     FOREIGN KEY (professor_id) REFERENCES people(person_id)
+    ALTER TABLE professors
+    ADD CONSTRAINT ck_professors_category CHECK (
+        category IN ('Ayudante','AyudanteDoctor','Titular','Catedrático')
+    );
 );
+
+ALTER TABLE professors
+    ADD CONSTRAINT ck_professors_category CHECK (
+        category IN ('Ayudante','AyudanteDoctor','Titular','Catedrático')
+    );
+
 
 DROP TABLE IF EXISTS students;
 
