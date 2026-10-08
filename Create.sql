@@ -28,14 +28,10 @@ CREATE TABLE professors (
     professor_id INT,
     category VARCHAR(30) NOT NULL,
     PRIMARY KEY (professor_id),
-    FOREIGN KEY (professor_id) REFERENCES people(person_id)
-    ALTER TABLE professors
-    ADD CONSTRAINT ck_professors_category CHECK (
+    FOREIGN KEY (professor_id) REFERENCES people(person_id),
+    CONSTRAINT ck_professors_category CHECK (
         category IN ('Ayudante','AyudanteDoctor','Titular','Catedrático')
-    );
-	 ADD CONSTRAINT ck_professors_category CHECK (
-        category IN ('Ayudante','AyudanteDoctor','Titular','Catedrático')
-    );
+    )
 );
     
 
@@ -47,10 +43,10 @@ CREATE TABLE students (
     student_id INT,
     access_method VARCHAR(20) NOT NULL,
     PRIMARY KEY (student_id),
-    FOREIGN KEY (student_id) REFERENCES people(person_id)
-    ADD CONSTRAINT ck_students_access_method CHECK (
+    FOREIGN KEY (student_id) REFERENCES people(person_id),
+    CONSTRAINT ck_students_access_method CHECK (
         access_method IN ('Selectividad','Ciclo','Mayor','Titulado','Extranjero')
-    );
+    )
 );
     
 
@@ -62,11 +58,9 @@ CREATE TABLE degrees (
     degree_id INT AUTO_INCREMENT,
     degree_name VARCHAR(80) NOT NULL,
     duration_years TINYINT NOT NULL,
-    PRIMARY KEY (degree_id)
-   ADD CONSTRAINT rn13_degree_duration CHECK (duration_years BETWEEN 3 AND 6),
-    ADD CONSTRAINT rn_uq_degrees_name UNIQUE (degree_name);
-
-
+    PRIMARY KEY (degree_id),
+   CONSTRAINT rn13_degree_duration CHECK (duration_years BETWEEN 3 AND 6),
+   CONSTRAINT rn_uq_degrees_name UNIQUE (degree_name)
 );
 
    
@@ -82,14 +76,14 @@ CREATE TABLE subjects (
     course TINYINT NOT NULL,
     subject_type VARCHAR(30) NOT NULL,
     PRIMARY KEY (subject_id),
-    FOREIGN KEY (degree_id) REFERENCES degrees(degree_id)
-    ADD CONSTRAINT rn10_subjects_credits CHECK (credits IN (6, 12)),
-    ADD CONSTRAINT rn16_subjects_course CHECK (course BETWEEN 1 AND 6),
-    ADD CONSTRAINT ck_subjects_type CHECK (
+    FOREIGN KEY (degree_id) REFERENCES degrees(degree_id),
+    CONSTRAINT rn10_subjects_credits CHECK (credits IN (6, 12)),
+    CONSTRAINT rn16_subjects_course CHECK (course BETWEEN 1 AND 6),
+    CONSTRAINT ck_subjects_type CHECK (
         subject_type IN ('Formación Básica','Obligatoria','Optativa')
     ),
-    ADD CONSTRAINT rn_uq_subjects_name UNIQUE (subject_name),
-    ADD CONSTRAINT rn_uq_subjects_acronym UNIQUE (acronym);
+    CONSTRAINT rn_uq_subjects_name UNIQUE (subject_name),
+    CONSTRAINT rn_uq_subjects_acronym UNIQUE (acronym)
 );
 
 
@@ -103,12 +97,12 @@ CREATE TABLE groups (
     activity VARCHAR(15) NOT NULL,
     academic_year YEAR NOT NULL,
     PRIMARY KEY (group_id),
-    FOREIGN KEY (subject_id) REFERENCES subjects(subject_id)
-    ADD CONSTRAINT rn15_groups_year CHECK (academic_year BETWEEN 2000 AND 2100),
-    ADD CONSTRAINT ck_groups_activity CHECK (
+    FOREIGN KEY (subject_id) REFERENCES subjects(subject_id),
+    CONSTRAINT rn15_groups_year CHECK (academic_year BETWEEN 2000 AND 2100),
+    CONSTRAINT ck_groups_activity CHECK (
         activity IN ('Teoría','Laboratorio')
     ),
-    ADD CONSTRAINT rn_uq_groups_name UNIQUE (subject_id, group_name, academic_year);
+    CONSTRAINT rn_uq_groups_name UNIQUE (subject_id, group_name, academic_year)
 );
 
 
@@ -138,14 +132,14 @@ CREATE TABLE grades (
     with_honors BOOLEAN NOT NULL DEFAULT 0,
     PRIMARY KEY (grade_id),
     FOREIGN KEY (student_id) REFERENCES students(student_id),
-    FOREIGN KEY (group_id) REFERENCES groups(group_id)
-    ADD CONSTRAINT rn11_grades_value CHECK (grade_value BETWEEN 0 AND 10),
-    ADD CONSTRAINT rn01_grades_with_honors CHECK (
+    FOREIGN KEY (group_id) REFERENCES groups(group_id),
+    CONSTRAINT rn11_grades_value CHECK (grade_value BETWEEN 0 AND 10),
+    CONSTRAINT rn01_grades_with_honors CHECK (
         with_honors = 0 OR grade_value >= 9
     ),
-    ADD CONSTRAINT rn18_grades_exam_call CHECK (
+    CONSTRAINT rn18_grades_exam_call CHECK (
         exam_call IN ('Primera','Segunda','Tercera','Extraordinaria')
-    );
+    )
 );
 
 DROP TABLE IF EXISTS subject_enrollments;
@@ -169,6 +163,6 @@ CREATE TABLE teaching_loads (
     credits DECIMAL(4,1) NOT NULL,
     PRIMARY KEY (professor_id, group_id),
     FOREIGN KEY (professor_id) REFERENCES professors(professor_id),
-    FOREIGN KEY (group_id) REFERENCES groups(group_id)
-    ADD CONSTRAINT ck_teaching_loads_credits CHECK (credits > 0);
+    FOREIGN KEY (group_id) REFERENCES groups(group_id),
+    CONSTRAINT ck_teaching_loads_credits CHECK (credits > 0)
 );
