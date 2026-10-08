@@ -26,11 +26,9 @@ DROP TABLE IF EXISTS professors;
 
 CREATE TABLE professors (
     professor_id INT,
-    category VARCHAR(30) NOT NULL,
+    category ENUM('Ayudante','AyudanteDoctor','Titular','Catedrático') NOT NULL, -- se puede hacer un enum en lugar de que category sea libre y ver si coinciden los caracterres
     PRIMARY KEY (professor_id),
     FOREIGN KEY (professor_id) REFERENCES people(person_id),
-    CONSTRAINT ck_professors_category CHECK (
-        category IN ('Ayudante','AyudanteDoctor','Titular','Catedrático')
     )
 );
     
@@ -97,7 +95,7 @@ CREATE TABLE groups (
     activity VARCHAR(15) NOT NULL,
     academic_year YEAR NOT NULL,
     PRIMARY KEY (group_id),
-    FOREIGN KEY (subject_id) REFERENCES subjects(subject_id),
+    FOREIGN KEY (subject_id) REFERENCES subjects(subject_id) ON DELETE CASCADE;
     CONSTRAINT rn15_groups_year CHECK (academic_year BETWEEN 2000 AND 2100),
     CONSTRAINT ck_groups_activity CHECK (
         activity IN ('Teoría','Laboratorio')
