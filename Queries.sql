@@ -82,6 +82,7 @@ SELECT MIN(grade_value) AS 'minimo',
 -- Producto cartesiano
 SELECT * FROM degrees, professors;
 
+-- theta-join como Sigma-restriccion del producto cartesiano
 SELECT * FROM people P, professors S
 WHERE P.person_id=S.professor_id;
 
@@ -96,3 +97,103 @@ SELECT * FROM people P
 	ON P.person_id=S.professor_id;
 
 
+/* NATURAL JOIN
+	Esquemas no calificados
+	Condicion de JOIN: atributos comunes entre relaciones */
+	
+SELECT * FROM grades NATURAL JOIN students;
+
+SELECT * FROM grades NATURAL JOIN students NATURAL JOIN groups;
+
+SELECT * FROM grades 
+	NATURAL JOIN students 
+	NATURAL JOIN groups
+	NATURAL JOIN subjects;
+
+
+SELECT * FROM grades 
+	NATURAL JOIN students 
+	NATURAL JOIN groups
+	NATURAL JOIN subjects
+	NATURAL JOIN degrees;
+	
+	
+SELECT * FROM grades 
+	NATURAL JOIN students 
+	NATURAL JOIN groups
+	NATURAL JOIN subjects
+	NATURAL JOIN degrees
+	NATURAL JOIN people; -- este no funciona bien porque poeple no tiene los mismosa tributos que el resto por diseño de la base de datos
+	
+	
+SELECT * FROM students ST JOIN people P ON ST.student_id = P.person_id;
+
+	
+/* definir vistas enriquecidas ascendentes desd egrades hasta entidades independientes */
+CREATE OR REPLACE VIEW V_grades AS
+	SELECT * FROM (
+		SELECT * from grades 
+			NATURAL JOIN students 
+			NATURAL JOIN groups
+			NATURAL JOIN subjects
+			NATURAL JOIN degrees
+	)X -- subconsulta	
+	JOIN people P ON X.student_id= P.person_id;
+
+-- Otra vista ascendente desd eteaching loads hasta entidades independientes
+CREATE OR REPLACE VIEW T_loads AS
+	SELECT * FROM teaching_loads
+		NATURAL JOIN groups
+		NATURAL JOIN professors
+		NATURAL JOIN subjects
+		NATURAL JOIN degrees 
+		JOIN people on people.person_id = professors.professor_id;
+
+
+
+
+-- q44: Contar estudiantes por metodo de acceso
+
+SELECT access_method, COUNT(*) FROM students
+	GROUP BY access_method;
+	
+-- q45: Cuenta asignaturas por grado
+
+SELECT degree_id, degree_name,COUNT(*) FROM subjects NATURAL JOIN degrees
+	GROUP BY degree_id, degree_name;
+
+
+-- q46: cuenta grupos por asignatura
+SELECT subject_id, subject_name, COUNT(*) FROM groups NATURAL JOIN SUBJECTs
+	GROUP BY subject_id, subject_name;
+	
+	
+-- q47: Estudiantes con media superior a 7
+SELECT student_id, AVG(grade_value), COUNT(*), SUM(grade_value), SUM(grade_value)/COUNT(*)
+	FROM grades
+	GROUP BY student_id
+	HAVING AVG(grade_value) >=7;
+
+-- Lo de antes como subconsulta
+SELECT * FROM
+	( SELECT student_id, AVG(grade_value) nm
+	FROM grades
+	GROUP BY student_id) AS X
+	WHERE nm >=7
+	
+	
+-- q55: tres asignaturas con mas estudiantes matriculados en grupos del 2024
+SELECT subject_id, subject_name, COUNT(*) FROM group_enrollments
+	NATURAL JOIN GROUPS
+	NATURAL JOIN subjects
+	GROUP BY subject_id, subject_name
+	ORDER BY 3 DESC
+	LIMIT 3;
+	
+
+-- q58: nota mas alta por cada estudiante
+SELECT student_id, first_name, last_name, MAX(grade_value) FROM V_grades
+	group by student_id, first_name, last_name
+	ORDER BY 4 DESC;
+		
+	

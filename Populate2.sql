@@ -99,7 +99,7 @@ BEGIN
         (6, 11), (7, 11), (8, 11);
 
     -- Más cargas docentes (RN003: máximo 2 profesores por grupo)
-    INSERT INTO teaching_loads (professor_id, group_id, credits) VALUES
+    INSERT INTO teaching_loads (professor_id, group_id, creditsT) VALUES
         (1, 4, 3.0),
         (2, 5, 1.5),
         (3, 6, 1.5),

@@ -188,7 +188,7 @@ INSERT INTO subject_enrollments (student_id, subject_id) VALUES
         (21, 11), (22, 11), (23, 11), (24, 11), (25, 11);
         
 
-INSERT INTO teaching_loads (professor_id, group_id, credits) VALUES
+INSERT INTO teaching_loads (professor_id, group_id, creditsT) VALUES
 	(1, 1, 3.0),
 	(2, 1, 3.0),
 	(3, 2, 3.0),

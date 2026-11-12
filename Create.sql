@@ -158,9 +158,9 @@ DROP TABLE IF EXISTS teaching_loads;
 CREATE TABLE teaching_loads (
     professor_id INT,
     group_id INT,
-    credits DECIMAL(4,1) NOT NULL,
+    creditsT DECIMAL(4,1) NOT NULL,
     PRIMARY KEY (professor_id, group_id),
     FOREIGN KEY (professor_id) REFERENCES professors(professor_id),
     FOREIGN KEY (group_id) REFERENCES groups(group_id),
-    CONSTRAINT ck_teaching_loads_credits CHECK (credits > 0)
+    CONSTRAINT ck_teaching_loads_credits CHECK (creditsT > 0)
 );
