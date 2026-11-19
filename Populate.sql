@@ -121,6 +121,13 @@ INSERT INTO groups (group_id, subject_id, group_name, activity, academic_year) V
         (2, 11, 'L1', 'Laboratorio', 2024),
         (3, 11, 'L2', 'Laboratorio', 2024);
 
+-- RN07: los alumnos se matriculan en la asignatura ANTES de entrar en sus grupos
+INSERT INTO subject_enrollments (student_id, subject_id) VALUES
+        (6, 11), (7, 11), (8, 11), (9, 11), (10, 11),
+        (11, 11), (12, 11), (13, 11), (14, 11), (15, 11),
+        (16, 11), (17, 11), (18, 11), (19, 11), (20, 11),
+        (21, 11), (22, 11), (23, 11), (24, 11), (25, 11);
+
 -- 20 alumnos están en el grupo de teoría
 -- los 10 primeros están el L1
 -- los 10 restantes en el L2
@@ -178,15 +185,7 @@ INSERT INTO grades (grade_id, student_id, group_id, grade_value, exam_call, with
     (33, 23, 1, 5.5, 'Tercera', 0),
     (34, 24, 1, 6.0, 'Tercera', 0),
     (35, 25, 1, 5.7, 'Tercera', 0);
-    
-    
-    
-INSERT INTO subject_enrollments (student_id, subject_id) VALUES
-        (6, 11), (7, 11), (8, 11), (9, 11), (10, 11),
-        (11, 11), (12, 11), (13, 11), (14, 11), (15, 11),
-        (16, 11), (17, 11), (18, 11), (19, 11), (20, 11),
-        (21, 11), (22, 11), (23, 11), (24, 11), (25, 11);
-        
+
 
 INSERT INTO teaching_loads (professor_id, group_id, creditsT) VALUES
 	(1, 1, 3.0),

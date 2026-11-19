@@ -1,4 +1,5 @@
 -- RN08: un alumno que accede por Selectividad debe tener al menos 16 años
+DELIMITER //
 CREATE OR REPLACE TRIGGER t_biu_students_rn08
 BEFORE INSERT OR UPDATE ON students
 FOR EACH ROW
@@ -23,7 +24,7 @@ BEGIN
     DECLARE v_count INT;
     -- ¿Está el alumno en el grupo de la nota?
     SELECT COUNT(*) INTO v_count
-    FROM students_groups
+    FROM group_enrollments
     WHERE student_id = NEW.student_id
       AND group_id = NEW.group_id;
 
@@ -107,7 +108,7 @@ END//
 -- RN04: un alumno solo puede estar en un grupo de teoría y en uno de
 -- laboratorio por asignatura
 CREATE OR REPLACE TRIGGER t_biu_students_groups_rn04_rn07
-BEFORE INSERT OR UPDATE ON students_groups
+BEFORE INSERT OR UPDATE ON group_enrollments
 FOR EACH ROW
 BEGIN
     DECLARE v_subject_id INT;
@@ -146,3 +147,5 @@ BEGIN
         END IF;
     END IF;
 END//
+
+DELIMITER ;

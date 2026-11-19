@@ -1,4 +1,5 @@
 -- Devuelve la nota media del alumno (0 si no tiene notas)
+DELIMITER //
 CREATE OR REPLACE FUNCTION f_student_average(
     p_student_id INT
 ) RETURNS DECIMAL(4,2)
@@ -12,6 +13,7 @@ BEGIN
 
     RETURN v_average;
 END //
+DELIMITER ;
 
 -- Usar en una consulta SELECT
 SELECT f_student_average(6) AS 'Promedio del estudiante 6';
@@ -32,6 +34,7 @@ WHERE f_student_average(s.student_id) >= 7.0;
 
 -- RN07: indica si el alumno está matriculado en la asignatura.
 -- La usa el trigger t_biu_students_groups_rn04_rn07
+DELIMITER //
 CREATE OR REPLACE FUNCTION f_is_student_enrolled(
     p_student_id INT,
     p_subject_id INT
@@ -42,11 +45,12 @@ READS SQL DATA
 BEGIN
     DECLARE v_exists INT;
     SELECT COUNT(*) INTO v_exists
-    FROM students_subjects
+    FROM subject_enrollments
     WHERE student_id = p_student_id
       AND subject_id = p_subject_id;
     RETURN v_exists > 0;
 END//
+DELIMITER ;
 
 
 -- Listar asignaturas con indicador de matrícula del estudiante 6 del grado 3
@@ -64,6 +68,7 @@ WHERE f_is_student_enrolled(6, s.subject_id) = TRUE;
 -- RN06: indica si la asignatura ya tiene en ese año académico el máximo de
 -- grupos de la actividad (uno de teoría o dos de laboratorio).
 -- La usa el trigger t_biu_groups_rn06
+DELIMITER //
 CREATE OR REPLACE FUNCTION f_subject_group_limit_reached(
     p_subject_id INT,
     p_activity VARCHAR(15),
@@ -92,6 +97,7 @@ BEGIN
 
     RETURN v_result;
 END//
+DELIMITER ;
 
 -- Verificar si la asignatura 1 ya tiene el máximo de grupos de teoría en 2025
 SELECT f_subject_group_limit_reached(1, 'Teoría', 2025) AS 'Límite alcanzado';
@@ -104,6 +110,7 @@ WHERE f_subject_group_limit_reached(s.subject_id, 'Teoría', 2025) = TRUE;
 
 -- RN04: indica si el alumno ya está en un grupo de la actividad (teoría o
 -- laboratorio) en la asignatura. La usa el trigger t_biu_students_groups_rn04_rn07
+DELIMITER //
 CREATE OR REPLACE FUNCTION f_student_group_limit(
     p_student_id INT,
     p_subject_id INT,
@@ -116,7 +123,7 @@ BEGIN
     DECLARE v_count INT;
     -- Grupos de esa asignatura y actividad en los que ya está el alumno
     SELECT COUNT(*) INTO v_count
-    FROM students_groups ge
+    FROM group_enrollments ge
     JOIN groups g ON g.group_id = ge.group_id
     WHERE ge.student_id = p_student_id
       AND g.subject_id = p_subject_id
@@ -125,3 +132,5 @@ BEGIN
     -- RN04: como máximo un grupo de cada actividad (teoría o laboratorio)
     RETURN v_count >= 1;
 END//
+
+DELIMITER ;

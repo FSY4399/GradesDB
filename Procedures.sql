@@ -1,4 +1,6 @@
 -- Borra todas las notas del alumno con el DNI indicado
+
+DELIMITER //
 CREATE OR REPLACE PROCEDURE p_delete_student_grades(
     IN p_student_dni CHAR(9)
 )
@@ -13,19 +15,20 @@ BEGIN
 
     DELETE FROM grades WHERE student_id = v_student_id;
 END //
-
+DELIMITER ;
 
 
 
 -- Borra todos los datos de la BD sin borrar las tablas
+DELIMITER //
 CREATE OR REPLACE PROCEDURE p_delete_all_data()
 BEGIN
     -- Primero las tablas que referencian a otras y después las referenciadas,
     -- para que ninguna fila se quede apuntando a una que ya no existe (FK)
     DELETE FROM grades;
     DELETE FROM teaching_loads;
-    DELETE FROM students_groups;
-    DELETE FROM students_subjects;
+    DELETE FROM group_enrollments;
+    DELETE FROM subject_enrollments;
     DELETE FROM groups;
     DELETE FROM subjects;
     DELETE FROM students;
@@ -33,10 +36,11 @@ BEGIN
     DELETE FROM degrees;
     DELETE FROM people;
 END //
-
+DELIMITER ;
 
 -- Devuelve en el parámetro de salida p_average la nota media del alumno
 -- (NULL si no tiene notas). Compárese con la función f_student_average (L5)
+DELIMITER //
 CREATE OR REPLACE PROCEDURE p_student_average(
     IN p_student_id INT,
     OUT p_average DECIMAL(4,2)
@@ -46,10 +50,13 @@ BEGIN
     FROM grades
     WHERE student_id = p_student_id;
 END //
+DELIMITER ;
+
 
 
 -- Sube un 15 % las notas entre 4.5 y 8 de un grupo en una convocatoria
 -- (sin pasar de 10) y muestra cuántas notas ha cambiado
+DELIMITER //
 CREATE OR REPLACE PROCEDURE p_boost_group_grades(
     IN p_group_id INT,
     IN p_exam_call VARCHAR(20)
@@ -75,10 +82,13 @@ BEGIN
     SELECT v_group_name AS group_name,
            v_affected_rows AS updated_grades;
 END //
+DELIMITER ;
+
 
 
 -- Asigna las matrículas de honor de un grupo en una convocatoria: a las
 -- mejores notas a partir de 9, como máximo al 5 % de los alumnos del grupo
+DELIMITER //
 CREATE OR REPLACE PROCEDURE p_assign_honors(
     IN p_group_id INT,
     IN p_exam_call VARCHAR(20)
@@ -88,7 +98,7 @@ BEGIN
     DECLARE v_max_honors INT;
 
     SELECT COUNT(*) INTO v_total_students
-    FROM students_groups
+    FROM group_enrollments
     WHERE group_id = p_group_id;
 
     -- FLOOR redondea hacia abajo: con menos de 20 alumnos no hay matrículas
@@ -123,3 +133,4 @@ BEGIN
         );
     END IF;
 END //
+DELIMITER ;

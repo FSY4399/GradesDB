@@ -164,7 +164,7 @@ SELECT degree_id, degree_name,COUNT(*) FROM subjects NATURAL JOIN degrees
 
 
 -- q46: cuenta grupos por asignatura
-SELECT subject_id, subject_name, COUNT(*) FROM groups NATURAL JOIN SUBJECTs
+SELECT subject_id, subject_name, COUNT(*) FROM groups NATURAL JOIN subjects
 	GROUP BY subject_id, subject_name;
 	
 	
@@ -179,12 +179,12 @@ SELECT * FROM
 	( SELECT student_id, AVG(grade_value) nm
 	FROM grades
 	GROUP BY student_id) AS X
-	WHERE nm >=7
+	WHERE nm >=7;
 	
 	
 -- q55: tres asignaturas con mas estudiantes matriculados en grupos del 2024
 SELECT subject_id, subject_name, COUNT(*) FROM group_enrollments
-	NATURAL JOIN GROUPS
+	NATURAL JOIN groups 
 	NATURAL JOIN subjects
 	GROUP BY subject_id, subject_name
 	ORDER BY 3 DESC
